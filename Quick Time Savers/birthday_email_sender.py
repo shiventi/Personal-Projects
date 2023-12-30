@@ -4,7 +4,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def send_birthday_email(receiver_email, subject, body):
-    # Set up the email server
+
+    
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587  
     smtp_username = 'your_email@gmail.com'
@@ -16,6 +17,7 @@ def send_birthday_email(receiver_email, subject, body):
     message['To'] = receiver_email
     message['Subject'] = subject
     message.attach(MIMEText(body, 'plain'))
+    
     with smtplib.SMTP(smtp_server, smtp_port) as server:
         server.starttls()
         server.login(smtp_username, smtp_password)
