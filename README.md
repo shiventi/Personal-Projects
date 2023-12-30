@@ -34,10 +34,10 @@ LEO is a chatbot with a web interface, using natural language processing (NLP) a
 
 ## Project Structure
 LEO/
-|-- facebook_bot.py # Main script containing the chatbot logic and web server setup.
-|-- intents.json # JSON file containing training data for the chatbot.
-|-- chatbot_dependencies.py # Module for additional chatbot dependencies.
-|-- webchat.html # HTML file for the web interface
-|-- favicon.png # Image for HTML (favicon).
-|-- leo_inaction.png # Image of LEO running.
-|-- model.tflearn # Saved model file or will save once the code runs.
+- facebook_bot.py          # Main script containing the chatbot logic and web server setup.
+- intents.json             # JSON file containing training data for the chatbot.
+- chatbot_dependencies.py  # Module for additional chatbot dependencies.
+- webchat.html             # HTML file for the web interface.
+- favicon.png              # Image for HTML (favicon).
+- leo_inaction.png         # Image of LEO in action.
+- model.tflearn            # Saved model file (will be created once the code runs).
