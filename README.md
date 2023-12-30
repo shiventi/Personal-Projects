@@ -38,6 +38,6 @@ LEO/
 - intents.json             # JSON file containing training data for the chatbot.
 - chatbot_dependencies.py  # Module for additional chatbot dependencies.
 - webchat.html             # HTML file for the web interface.
-- favicon.png              # Image for HTML (favicon).
+- favicon1.png              # Image for HTML (favicon).
 - leo_inaction.png         # Image of LEO in action.
 - model.tflearn            # Saved model file (will be created once the code runs).
