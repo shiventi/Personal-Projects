@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEO</title>
+    <link rel="icon" type="image/x-icon" href="favicon1.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            background-color: #191b28;
+            margin: 0;
+            color: #fff;
+        }
+
+        #record-button {
+            padding: 10px 15px;
+            background-color: #d9534f;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.5s, transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #record-button:hover {
+            background-color: #c9302c;
+            transform: scale(1.05);
+        }
+
+        #record-button:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transition: transform 0.5s ease-out;
+            pointer-events: none;
+        }
+
+        #record-button.recording:before {
+            transform: translate(-50%, -50%) scale(2);
+        }
+
+        #wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: #11141e;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #current-time,
+        #current-date {
+            opacity: 0;
+            animation: fadeIn 3s ease-out forwards;
+            margin-right: 10px;
+        }
+
+        #chat-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: scroll;
+            position: relative;
+            background-color: #191b28;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            margin: 20px;
+            transition: background-color 0.5s;
+            scroll-behavior: smooth;
+        }
+
+        #chat-container:hover {
+            background-color: #22243a;
+        }
+
+        #typing-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            opacity: 0;
+            display: flex;
+            color: #00ff00;
+        }
+
+        #typing-indicator span {
+            margin-right: 5px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        #header {
+            color: #bbb;
+            font-size: 14px;
+            margin-top: 1px;
+            margin-left: 1200px;
+            opacity: 0;
+            animation: fadeIn 5s ease-out forwards;
+        }
+
+        #chat {
+            margin-bottom: 80px;
+            max-height: calc(100% - 80px);
+            overflow-y: scroll;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #input-container {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background-color: #191b28;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            border-top: 1px solid #11141e;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            border-radius: 50px;
+            color: #eee;
+            background-color: #11141e;
+            outline: none;
+            transition: background-color 1s;
+        }
+
+        input[type="text"]:focus {
+            background-color: #000000;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #4f5b93;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.1s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #6c78b5;
+            transform: scale(1.05);
+        }
+
+        #speak-button {
+            background-color: #f39c12; 
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.5s, transform 0.3s;
+        }
+
+        #speak-button:hover {
+            background-color: #d35400;
+            transform: scale(1.05);
+        }
+
+        strong {
+            color: #00ff00;
+        }
+
+        .message-container {
+            margin-bottom: 10px;
+            position: relative;
+            animation: fadeInMessage 0.5s ease-out;
+        }
+
+        .user-message,
+        .bot-message {
+            max-width: 70%;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+
+        .user-message {
+            background-color: #4f5b93;
+            color: #fff;
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            background-color: #00ff00;
+            color: #000;
+            align-self: flex-start;
+        }
+
+
+
+        @keyframes fadeInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bot-message {
+            margin-top: 10px;
+        }
+
+
+        @keyframes explodeAnimation {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 20px;
+            right: 70px;
+            display: inline-block;
+        }
+
+        .dropbtn {
+            background-color: #11141e;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #191b28;
+            width: 120px;
+            max-height: 120px;
+            overflow-y: auto;
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content button {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            background-color: #191b28;
+            border: none;
+            width: 200%;
+            text-align: left;
+        }
+
+        .dropdown-content button:hover {
+            background-color: #22243a;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .leo-text {
+            position: absolute;
+            top: 28px;
+            right: 12px;
+            color: #FAFAD2;
+            font-family: 'Raleway';
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-content {
+            background-color: #191b28;
+            border: 1px solid #888;
+            padding: 0;
+            position: absolute;
+        }
+
+        .modal-content-header {
+            padding: 10px;
+            background-color: #22243a;
+            color: white;
+            font-weight: bold;
+        }
+
+        .modal iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .close {
+            color: #bbb;
+            float: right;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #fff;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <canvas id="matrix-container"></canvas>
+    <div id="wrapper">
+        <div id="chat-container">
+
+            <div id="header">
+                <script>
+                    function updateClock() {
+                        const now = new Date();
+                        const formattedDate = now.toLocaleDateString();
+                        const formattedTime = now.toLocaleTimeString();
+                        const currentDate = document.getElementById('current-date');
+                        const currentTime = document.getElementById('current-time');
+                        currentDate.textContent = formattedDate;
+                        currentTime.textContent = formattedTime;
+                        currentDate.style.opacity = 1;
+                        currentTime.style.opacity = 1;
+                    }
+                    setInterval(updateClock, 1000);
+                </script>
+                <span id="current-time"></span><br>
+                <span id="current-date"></span>
+            </div>
+
+            <div id="chat"></div>
+            <div id="typing-indicator" style="display: none;">
+                <span>.</span>
+                <span>.</span>
+                <span>.</span>
+            </div>
+            <div id="input-container">
+                <input type="text" id="user-input" placeholder="Type your message..." onkeyup="handleKeyPress(event)">
+                <button onclick="sendMessage()">Send</button>
+                <button id="record-button" onclick="toggleRecording()">Record</button>
+                <button id="speak-button" onclick="speakOutput()">Speak</button>
+            </div>
+            <div class="leo-text" onclick="reloadPage()">🄻🄴🄾</div>
+
+            <div class="dropdown">
+                <button onclick="toggleDropdown()" class="dropbtn">&#8285;</button>
+                <div id="dropdown-content" class="dropdown-content">
+                    <button onclick="handleQuickLinkClick('Link 1')">Google</button>
+                    <button onclick="handleQuickLinkClick('Link 2')">Youtube</button>
+                    <button onclick="handleQuickLinkClick('Link 3')">Gmail</button>
+                    <button onclick="handleQuickLinkClick('Link 5')">Stocks</button>
+                    <button onclick="handleQuickLinkClick('Link 6')">News</button>
+                    <button onclick="handleQuickLinkClick('Link 7')">Search</button>
+                    <button onclick="handleQuickLinkClick('Link 4')">ARMS</button>
+                    
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        var canvas = document.getElementById('matrix-container'),
+            ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        var letters = 'ABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZ';
+        letters = letters.split('');
+
+        var fontSize = 10,
+            columns = canvas.width / fontSize;
+
+        var drops = [];
+        for (var i = 0; i < columns; i++) {
+            drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
+        }
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, .05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (var i = 0; i < drops.length; i++) {
+                var text = letters[Math.floor(Math.random() * letters.length)];
+
+                ctx.save();
+                ctx.translate(i * fontSize, drops[i] * fontSize);
+                ctx.rotate(Math.random() * 360 * Math.PI / 180);
+                ctx.scale(Math.random() * 1.5, Math.random() * 1.5);
+                ctx.fillStyle = '#' + (Math.random().toString(16) + '000000').substring(2, 8);
+                ctx.fillText(text, 0, 0);
+                ctx.restore();
+
+                drops[i]++;
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > .95) {
+                    drops[i] = 0;
+                }
+            }
+        }
+
+        var animationInterval = setInterval(draw, 33);
+
+        setTimeout(function () {
+            clearInterval(animationInterval);
+            canvas.style.display = 'none';
+            document.getElementById('chat-container').style.display = 'block';
+        }, 5000);
+
+        function appendMessage(sender, message) {
+            const chatContainer = document.getElementById("chat");
+            const messageContainer = document.createElement("div");
+            messageContainer.className = "message-container";
+            const messageDiv = document.createElement("div");
+            const messageClass = sender === "Bot" ? "bot-message" : "";
+            messageDiv.className = `message ${messageClass}`;
+            messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            messageContainer.appendChild(messageDiv);
+            chatContainer.appendChild(messageContainer);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function sendMessage() {
+            const userInput = document.getElementById("user-input");
+            const userMessage = userInput.value.trim();
+            if (userMessage !== "") {
+                appendMessage("You", userMessage);
+                userInput.value = "";
+
+                chat(userMessage);
+            }
+        }
+
+        function chat(userInput) {
+            fetch('/', {
+                method: 'POST',
+                body: `user_input=${encodeURIComponent(userInput)}`,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            })
+                .then(response => response.text())
+                .then(botResponse => {
+                    appendMessage("Bot", botResponse);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+
+        const recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        let isRecording = false;
+        let timeoutId;
+
+        recognition.onresult = function (event) {
+            const transcript = Array.from(event.results)
+                .map(result => result[0].transcript)
+                .join(' ');
+
+            document.getElementById("user-input").value = transcript;
+
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(stopRecognition, 2000);
+        };
+
+        recognition.onend = function () {
+            if (isRecording) {
+                recognition.start();
+            }
+        };
+
+        recognition.onerror = function (event) {
+            console.error('Speech recognition error:', event.error);
+        };
+
+        function startRecognition() {
+            try {
+                recognition.start();
+            } catch (error) {
+                console.error('Error starting speech recognition:', error);
+            }
+        }
+
+        function stopRecognition() {
+            isRecording = false;
+            recognition.stop();
+
+            sendMessage();
+        }
+
+        function toggleRecording() {
+            if (isRecording) {
+                stopRecognition();
+            } else {
+                isRecording = true;
+                startRecognition();
+            }
+        }
+
+        function speakOutput() {
+            const messageContainers = document.querySelectorAll('.message-container');
+
+            if (messageContainers.length > 0) {
+                const latestMessageContainer = messageContainers[messageContainers.length - 1];
+
+                const latestMessage = latestMessageContainer.querySelector('.message');
+
+                if (latestMessage) {
+                    const messageText = latestMessage.textContent.trim().split(' ').slice(1).join(' ');
+
+                    const utterance = new SpeechSynthesisUtterance(messageText);
+                    speechSynthesis.speak(utterance);
+                }
+            }
+        }
+
+        function toggleDropdown() {
+            document.getElementById("dropdown-content").classList.toggle("show");
+        }
+
+
+        function handleQuickLinkClick(link) {
+            switch (link) {
+                case 'Link 1':
+                    window.open('https://google.com', '_blank');
+                    break;
+                case 'Link 2':
+                    window.open('https://youtube.com', '_blank');
+                    break;
+                case 'Link 3':
+                    window.open('https://gmail.com/', '_blank');
+                    break;
+                case 'Link 4':
+                    window.open('https://esuhsd.us001-rapididentity.com/idp/AuthnEngine#/authn', "_blank")
+                case 'Link 5':
+                    openResizableModal('https://site.financialmodelingprep.com/', 'Stock Market', 900, 600);
+                    break;
+                case 'Link 6':
+                    openResizableModal('https://www.cbsnews.com/world/', 'World News', 900, 600);
+                    break;
+                case 'Link 7':
+                    openResizableModal('https://www.bing.com/', 'Search', 900, 600);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        function openResizableModal(url, title, width, height) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-content-header">${title}</div>
+                    <span class="close" onclick="closeModal(this)">&times;</span>
+                    <iframe src="${url}" width="100%" height="100%"></iframe>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            modal.style.width = `${width}px`;
+            modal.style.height = `${height}px`;
+            modal.style.top = '50px';
+            modal.style.left = '50px'; 
+
+            $(modal).find('.modal-content').resizable({
+                minWidth: 200,
+                minHeight: 150
+            }).draggable();
+
+            modal.style.display = 'block';
+        }
+
+        function closeModal(button) {
+            const modal = button.closest('.modal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.removeChild(modal);
+            }
+        }
+
+        window.onclick = function (event) {
+            if (!event.target.matches('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                var i;
+                for (i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
+        function reloadPage() {
+            location.reload();
+        }
+
+
+    </script>
+</body>
+
+</html>
