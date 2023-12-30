@@ -5,7 +5,6 @@ from email.mime.multipart import MIMEMultipart
 
 def send_birthday_email(receiver_email, subject, body):
 
-    
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587  
     smtp_username = 'your_email@gmail.com'
