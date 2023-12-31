@@ -26,7 +26,7 @@ LEO is a chatbot with a web interface, using natural language processing (NLP) a
    cd Personal-Projects/LEO
 
 ## Usage:
-    python chatbot_server.py (make sure to pip install all libraries)
+    python facebook_bot.py (make sure to pip install all libraries)
 
 ## Customization: 
 - Customize chatbot responses by modifying the intents.json file.
