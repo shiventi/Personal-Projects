@@ -68,6 +68,13 @@ def train_tflearn_model(training, output):
 
     return model
 
+def classify_intent(input_text):
+    input_text_lower = input_text.lower()
+    if "question" in input_text_lower:
+        return "questions", 1.0
+    else:
+        return "default", 0.8
+
 def add_input_to_tag(text, tag):
     with open("intents.json", "r") as file:
         intents_data = json.load(file)["intents"]
@@ -156,6 +163,7 @@ def chat(input_text):
                             res = blenderbot_model.generate(**inputs)
                             output = tokenizer.decode(res[0], skip_special_tokens=True)
                             return str(output)
+
                     else:
                         responses = intent['responses']
                         add_input_to_tag(input_text, tag)
@@ -186,9 +194,6 @@ class WebChatHandler(SimpleHTTPRequestHandler):
             bot_response = chat(user_input)
             print(bot_response)
 
-            print(f"Received request with user_input: {user_input}")
-            print(f"Generated bot_response: {bot_response}")
-
             if isinstance(bot_response, str):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/plain')
@@ -209,7 +214,6 @@ class WebChatHandler(SimpleHTTPRequestHandler):
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
             self.wfile.write(bytes("Bad Request", 'utf-8'))
-
 
 if __name__ == "__main__":
     port = 8001
